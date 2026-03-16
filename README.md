@@ -431,6 +431,16 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
+### Git Hooks (pre-push)
+
+The repository ships a pre-push hook at `scripts/pre-push.sh` that mirrors the CI pipeline (ruff → black → mypy → pytest → build check). Install it once after cloning:
+
+```bash
+ln -sf "$(pwd)/scripts/pre-push.sh" .git/hooks/pre-push
+```
+
+From that point on, every `git push` will run all checks locally. If any step fails the push is blocked and the terminal will show which check failed.
+
 ### Running Tests
 
 ```bash
