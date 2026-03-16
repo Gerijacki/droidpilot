@@ -39,14 +39,6 @@ Whether you're automating UI tests, building social media bots, or stress-testin
 
 ## Installation
 
-### From PyPI (once published)
-
-```bash
-pip install droidpilot
-```
-
-### From source
-
 ```bash
 git clone https://github.com/Gerijacki/droidpilot.git
 cd droidpilot
