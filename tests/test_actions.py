@@ -7,7 +7,7 @@ All device calls are mocked so no physical ADB device is required.
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -49,7 +49,6 @@ from droidpilot.actions.text import (
     type_line,
     type_text,
 )
-
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 

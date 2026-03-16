@@ -16,12 +16,15 @@ specific ADB device serial.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from droidpilot.adb.device import ADBDevice
+
 import json
 import sys
 import time
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
 
 import click
 from rich.console import Console
@@ -187,9 +190,7 @@ def cmd_run(
         def _stopper() -> None:
             time.sleep(timeout)
             if ctx.is_running:
-                console.print(
-                    f"\n[yellow]Timeout after {timeout}s — stopping execution.[/yellow]"
-                )
+                console.print(f"\n[yellow]Timeout after {timeout}s — stopping execution.[/yellow]")
                 ctx.stop()
 
         t = threading.Thread(target=_stopper, daemon=True)
@@ -265,9 +266,7 @@ def cmd_devices(as_json: bool) -> None:
 
     if not entries:
         _console.print("[yellow]No devices connected.[/yellow]")
-        _console.print(
-            "Connect a device via USB or run: [dim]adb connect <host>:<port>[/dim]"
-        )
+        _console.print("Connect a device via USB or run: [dim]adb connect <host>:<port>[/dim]")
         return
 
     table = Table(title="Connected ADB Devices", show_header=True, header_style="bold cyan")
@@ -438,9 +437,7 @@ def cmd_shell(device: str | None, command: tuple[str, ...]) -> None:
         return
 
     # Interactive mode.
-    _console.print(
-        f"[bold cyan]DroidPilot Shell[/bold cyan] — device [green]{dev.serial}[/green]"
-    )
+    _console.print(f"[bold cyan]DroidPilot Shell[/bold cyan] — device [green]{dev.serial}[/green]")
     _console.print("Type [dim]exit[/dim] or press Ctrl-D to quit.\n")
 
     while True:
@@ -501,7 +498,7 @@ def cmd_record(device: str | None, output: str | None, duration: float | None) -
       droidpilot record -o my_recording.dp
       droidpilot record --duration 30 -o short_demo.dp
     """
-    from droidpilot.recorder.event_recorder import EventRecorder, RecorderError
+    from droidpilot.recorder.event_recorder import EventRecorder
 
     if output is None:
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -509,9 +506,7 @@ def cmd_record(device: str | None, output: str | None, duration: float | None) -
 
     dev = _get_device(device)
     _console.print(f"[bold cyan]Device:[/bold cyan] {dev.serial}")
-    _console.print(
-        f"[bold green]Recording[/bold green] interactions → [green]{output}[/green]"
-    )
+    _console.print(f"[bold green]Recording[/bold green] interactions → [green]{output}[/green]")
 
     if duration:
         _console.print(f"Will auto-stop after [yellow]{duration:.1f}s[/yellow].")
@@ -532,9 +527,7 @@ def cmd_record(device: str | None, output: str | None, duration: float | None) -
         recorder.stop()
 
     events = recorder.events
-    _console.print(
-        f"\n[bold green]Captured[/bold green] {len(events)} interaction(s)."
-    )
+    _console.print(f"\n[bold green]Captured[/bold green] {len(events)} interaction(s).")
 
     if not events:
         _console.print("[yellow]No events recorded.  Nothing saved.[/yellow]")
@@ -580,28 +573,31 @@ def cmd_doctor(device: str | None) -> None:
     import importlib
     import shutil
 
-    _console.print(
-        "\n[bold cyan]DroidPilot Doctor[/bold cyan] — system health check\n"
-    )
+    _console.print("\n[bold cyan]DroidPilot Doctor[/bold cyan] — system health check\n")
 
     checks: list[tuple[str, bool, str]] = []  # (label, ok, detail)
 
     # ── Python version ───────────────────────────────────────────────────────
     import sys as _sys
+
     py_ok = _sys.version_info >= (3, 11)
-    checks.append((
-        "Python ≥ 3.11",
-        py_ok,
-        f"{_sys.version_info.major}.{_sys.version_info.minor}.{_sys.version_info.micro}",
-    ))
+    checks.append(
+        (
+            "Python ≥ 3.11",
+            py_ok,
+            f"{_sys.version_info.major}.{_sys.version_info.minor}.{_sys.version_info.micro}",
+        )
+    )
 
     # ── adb binary ───────────────────────────────────────────────────────────
     adb_path = shutil.which("adb")
-    checks.append((
-        "adb binary on PATH",
-        adb_path is not None,
-        adb_path or "not found — install android-platform-tools",
-    ))
+    checks.append(
+        (
+            "adb binary on PATH",
+            adb_path is not None,
+            adb_path or "not found — install android-platform-tools",
+        )
+    )
 
     # ── Python packages ──────────────────────────────────────────────────────
     packages = [
@@ -618,16 +614,19 @@ def cmd_doctor(device: str | None) -> None:
             ver = getattr(mod, "__version__", "installed")
             checks.append((f"pkg: {pkg_name}", True, ver))
         except ImportError:
-            checks.append((
-                f"pkg: {pkg_name}",
-                False,
-                f"not installed — run: pip install {pkg_name}",
-            ))
+            checks.append(
+                (
+                    f"pkg: {pkg_name}",
+                    False,
+                    f"not installed — run: pip install {pkg_name}",
+                )
+            )
 
     # ── ADB server ───────────────────────────────────────────────────────────
     if adb_path:
         try:
             import subprocess as _sp
+
             result = _sp.run(
                 ["adb", "devices"],
                 capture_output=True,
@@ -635,22 +634,23 @@ def cmd_doctor(device: str | None) -> None:
                 timeout=5,
             )
             adb_server_ok = result.returncode == 0
-            checks.append((
-                "adb server",
-                adb_server_ok,
-                "running" if adb_server_ok else result.stderr.strip(),
-            ))
+            checks.append(
+                (
+                    "adb server",
+                    adb_server_ok,
+                    "running" if adb_server_ok else result.stderr.strip(),
+                )
+            )
 
             # Count connected devices
-            lines = [
-                ln for ln in result.stdout.splitlines()[1:]
-                if ln.strip() and "device" in ln
-            ]
-            checks.append((
-                "connected devices",
-                len(lines) > 0,
-                f"{len(lines)} device(s) detected",
-            ))
+            lines = [ln for ln in result.stdout.splitlines()[1:] if ln.strip() and "device" in ln]
+            checks.append(
+                (
+                    "connected devices",
+                    len(lines) > 0,
+                    f"{len(lines)} device(s) detected",
+                )
+            )
         except Exception as exc:
             checks.append(("adb server", False, str(exc)))
 
@@ -658,13 +658,16 @@ def cmd_doctor(device: str | None) -> None:
     if device and adb_path:
         try:
             from droidpilot.adb.client import ADBClient
+
             client = ADBClient()
             entry = client.get_device_entry(device)
-            checks.append((
-                f"device {device!r}",
-                entry.is_online,
-                f"state={entry.state} model={entry.model or 'unknown'}",
-            ))
+            checks.append(
+                (
+                    f"device {device!r}",
+                    entry.is_online,
+                    f"state={entry.state} model={entry.model or 'unknown'}",
+                )
+            )
         except Exception as exc:
             checks.append((f"device {device!r}", False, str(exc)))
 
@@ -689,9 +692,7 @@ def cmd_doctor(device: str | None) -> None:
     _console.print()
 
     if all_ok:
-        _console.print(
-            "[bold green]All checks passed — DroidPilot is ready.[/bold green]"
-        )
+        _console.print("[bold green]All checks passed — DroidPilot is ready.[/bold green]")
         sys.exit(0)
     else:
         _err_console.print(

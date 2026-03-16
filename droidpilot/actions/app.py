@@ -129,7 +129,7 @@ def install_apk(device: "ADBDevice", apk_path: str) -> None:
 
     logger.info(f"[install_apk] installing {apk_path!r}")
     device.install(str(path))
-    logger.info(f"[install_apk] installation complete")
+    logger.info("[install_apk] installation complete")
 
 
 def uninstall_app(device: "ADBDevice", package: str) -> None:

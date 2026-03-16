@@ -145,8 +145,7 @@ class PluginLoader:
                 manifest = self._load_entry_point(ep)
                 manifests.append(manifest)
                 logger.info(
-                    f"[plugins] loaded {manifest.name!r} — "
-                    f"{len(manifest.commands)} command(s)"
+                    f"[plugins] loaded {manifest.name!r} — " f"{len(manifest.commands)} command(s)"
                 )
             except PluginError as exc:
                 logger.error(f"[plugins] failed to load {ep.name!r}: {exc}")
@@ -182,9 +181,7 @@ class PluginLoader:
         try:
             module = importlib.import_module(module_path)
         except ImportError as exc:
-            raise PluginError(
-                f"Cannot import plugin module {module_path!r}: {exc}"
-            ) from exc
+            raise PluginError(f"Cannot import plugin module {module_path!r}: {exc}") from exc
 
         return self._activate(module, plugin_name, module_path)
 
@@ -224,20 +221,16 @@ class PluginLoader:
 
         spec = importlib.util.spec_from_file_location(plugin_name, str(path))
         if spec is None or spec.loader is None:
-            raise PluginError(
-                f"Cannot create module spec for plugin file {file_path!r}"
-            )
+            raise PluginError(f"Cannot create module spec for plugin file {file_path!r}")
 
         module = importlib.util.module_from_spec(spec)
         sys.modules[plugin_name] = module
 
         try:
-            spec.loader.exec_module(module)  # type: ignore[union-attr]
+            spec.loader.exec_module(module)
         except Exception as exc:
             del sys.modules[plugin_name]
-            raise PluginError(
-                f"Error executing plugin file {file_path!r}: {exc}"
-            ) from exc
+            raise PluginError(f"Error executing plugin file {file_path!r}: {exc}") from exc
 
         return self._activate(module, plugin_name, str(path))
 
@@ -300,6 +293,7 @@ class PluginLoader:
             if module is None:
                 # Create a synthetic module.
                 import types
+
                 module = types.ModuleType(module_name)
                 module.register = obj  # type: ignore[attr-defined]
         else:
@@ -346,15 +340,11 @@ class PluginLoader:
         )
 
         # Style 1: COMMANDS dict
-        commands_dict: dict[str, Callable[..., Any]] | None = getattr(
-            module, "COMMANDS", None
-        )
+        commands_dict: dict[str, Callable[..., Any]] | None = getattr(module, "COMMANDS", None)
         if commands_dict and isinstance(commands_dict, dict):
             for cmd_name, fn in commands_dict.items():
                 if not callable(fn):
-                    logger.warning(
-                        f"[plugins] {name!r}: COMMANDS[{cmd_name!r}] is not callable"
-                    )
+                    logger.warning(f"[plugins] {name!r}: COMMANDS[{cmd_name!r}] is not callable")
                     continue
                 self._context.register_command(cmd_name, fn)
                 manifest.commands[cmd_name] = fn
@@ -368,17 +358,13 @@ class PluginLoader:
             try:
                 register_fn(self._context)
             except Exception as exc:
-                raise PluginError(
-                    f"Plugin {name!r} register() raised an exception: {exc}"
-                ) from exc
+                raise PluginError(f"Plugin {name!r} register() raised an exception: {exc}") from exc
             after = set(self._context.commands.keys())
             new_cmds = after - before
             for cmd_name in new_cmds:
                 fn = self._context.commands[cmd_name]
                 manifest.commands[cmd_name] = fn
-                logger.debug(
-                    f"[plugins] {name!r}: registered command {cmd_name!r} via register()"
-                )
+                logger.debug(f"[plugins] {name!r}: registered command {cmd_name!r} via register()")
 
         if not manifest.commands and commands_dict is None and register_fn is None:
             raise PluginError(

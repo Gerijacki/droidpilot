@@ -16,9 +16,9 @@ screenshot  Screen capture utilities.
 
 from droidpilot.actions.app import force_stop_app, open_app
 from droidpilot.actions.screenshot import capture_screenshot
-from droidpilot.actions.swipe import swipe, scroll_down, scroll_up
-from droidpilot.actions.tap import tap, long_press
-from droidpilot.actions.text import type_text, clear_field, type_line
+from droidpilot.actions.swipe import scroll_down, scroll_up, swipe
+from droidpilot.actions.tap import long_press, tap
+from droidpilot.actions.text import clear_field, type_line, type_text
 
 __all__ = [
     "tap",

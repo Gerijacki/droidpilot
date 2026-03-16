@@ -6,9 +6,6 @@ All tests use a mock ExecutionContext so no real ADB device is required.
 
 from __future__ import annotations
 
-import operator
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from droidpilot.core.ast_nodes import (
@@ -28,7 +25,6 @@ from droidpilot.core.ast_nodes import (
     VariableRef,
 )
 from droidpilot.core.context import ExecutionContext
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 

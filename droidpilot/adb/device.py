@@ -18,9 +18,8 @@ Usage::
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
-from droidpilot.adb.client import ADBClient, ADBError, DeviceNotFoundError
+from droidpilot.adb.client import ADBClient, DeviceNotFoundError
 
 
 class ADBDevice:
@@ -309,9 +308,7 @@ class ADBDevice:
 
     def current_activity(self) -> str:
         """Return the currently focused activity name."""
-        raw = self.shell(
-            "dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'"
-        )
+        raw = self.shell("dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'")
         return raw.strip()
 
     def battery_level(self) -> int:

@@ -7,32 +7,22 @@ is required.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from droidpilot.core.ast_nodes import (
-    AssignNode,
-    BoolLiteral,
     CommandNode,
-    IfNode,
-    MacroCallNode,
-    MacroDefNode,
     NumberLiteral,
     ProgramNode,
-    RepeatNode,
     StringLiteral,
 )
 from droidpilot.core.context import ExecutionContext, ExecutionState
 from droidpilot.core.engine import (
     BUILTIN_COMMANDS,
     CommandError,
-    DeviceRequiredError,
     ExecutionEngine,
     ExecutionError,
     ExecutionResult,
 )
-
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -47,8 +37,9 @@ def _make_program(*statements) -> ProgramNode:
 
 def _cmd(name: str, *args) -> CommandNode:
     """Shorthand for creating a CommandNode."""
-    arg_nodes = [NumberLiteral(value=a) if isinstance(a, int) else StringLiteral(value=a)
-                 for a in args]
+    arg_nodes = [
+        NumberLiteral(value=a) if isinstance(a, int) else StringLiteral(value=a) for a in args
+    ]
     return CommandNode(name=name, args=arg_nodes)
 
 
@@ -224,9 +215,7 @@ class TestWaitCommand:
     def test_wait_sleeps(self) -> None:
         engine = ExecutionEngine()
         ctx = _make_ctx()
-        prog = _make_program(
-            CommandNode(name="wait", args=[NumberLiteral(0)])
-        )
+        prog = _make_program(CommandNode(name="wait", args=[NumberLiteral(0)]))
         result = engine.execute(prog, ctx)
         assert result.success is True
 
@@ -245,9 +234,7 @@ class TestPrintCommand:
     def test_print_does_not_raise(self) -> None:
         engine = ExecutionEngine()
         ctx = _make_ctx()
-        prog = _make_program(
-            CommandNode(name="print", args=[StringLiteral("hello world")])
-        )
+        prog = _make_program(CommandNode(name="print", args=[StringLiteral("hello world")]))
         result = engine.execute(prog, ctx)
         assert result.success is True
 

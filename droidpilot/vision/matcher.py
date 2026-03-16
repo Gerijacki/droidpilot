@@ -28,7 +28,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
 logger = logging.getLogger("droidpilot.vision")
 
@@ -73,10 +73,7 @@ class MatchResult:
 
     def __repr__(self) -> str:
         status = f"found at {self.location}" if self.found else "not found"
-        return (
-            f"MatchResult({status}, score={self.score:.3f}, "
-            f"template={self.template_path!r})"
-        )
+        return f"MatchResult({status}, score={self.score:.3f}, " f"template={self.template_path!r})"
 
 
 # ─── Matcher ──────────────────────────────────────────────────────────────────
@@ -121,6 +118,7 @@ class TemplateMatcher:
         """Import OpenCV, raising a helpful error if not installed."""
         try:
             import cv2
+
             return cv2
         except ImportError as exc:
             raise ImportError(
@@ -133,11 +131,11 @@ class TemplateMatcher:
         """Import NumPy, raising a helpful error if not installed."""
         try:
             import numpy as np
+
             return np
         except ImportError as exc:
             raise ImportError(
-                "NumPy is required for image matching. "
-                "Install it with: pip install numpy"
+                "NumPy is required for image matching. " "Install it with: pip install numpy"
             ) from exc
 
     def _load_image(self, path: str, grayscale: bool = False) -> Any:
@@ -230,8 +228,7 @@ class TemplateMatcher:
 
         if t_h > s_h or t_w > s_w:
             logger.warning(
-                f"Template ({t_w}x{t_h}) is larger than screen ({s_w}x{s_h}); "
-                "no match possible."
+                f"Template ({t_w}x{t_h}) is larger than screen ({s_w}x{s_h}); " "no match possible."
             )
             return MatchResult(
                 found=False,
@@ -310,19 +307,14 @@ class TemplateMatcher:
         for pt_y, pt_x in zip(locations_y, locations_x):
             centre = self._centre_of_match((int(pt_x), int(pt_y)), template.shape)
             # Simple deduplication: skip if within 10px of an existing match.
-            duplicate = any(
-                abs(centre[0] - s[0]) < 10 and abs(centre[1] - s[1]) < 10
-                for s in seen
-            )
+            duplicate = any(abs(centre[0] - s[0]) < 10 and abs(centre[1] - s[1]) < 10 for s in seen)
             if not duplicate:
                 centres.append(centre)
                 seen.add(centre)
                 if len(centres) >= max_results:
                     break
 
-        logger.debug(
-            f"[matcher] find_all {template_path!r}: {len(centres)} match(es)"
-        )
+        logger.debug(f"[matcher] find_all {template_path!r}: {len(centres)} match(es)")
         return centres
 
     def compare(self, image_path_a: str, image_path_b: str) -> float:
@@ -353,7 +345,3 @@ class TemplateMatcher:
 
         result = self._cv2.matchTemplate(img_a, img_b, self._cv2.TM_CCOEFF_NORMED)
         return float(result[0][0])
-
-
-# Type alias for internal use only.
-from typing import Any

@@ -68,9 +68,13 @@ ok "pytest OK"
 # ── 5. Build check ───────────────────────────────────────────────────────────
 step "Build — verificación del paquete"
 TMP_BUILD=$(mktemp -d)
-python -m build --outdir "$TMP_BUILD" --wheel 2>/dev/null \
-    || fail "python -m build falló."
-twine check "$TMP_BUILD"/* || { rm -rf "$TMP_BUILD"; fail "twine check falló."; }
+python3 -m build --outdir "$TMP_BUILD" --wheel 2>/dev/null \
+    || { rm -rf "$TMP_BUILD"; fail "python3 -m build falló."; }
+if command -v twine &>/dev/null; then
+    twine check "$TMP_BUILD"/* || { rm -rf "$TMP_BUILD"; fail "twine check falló."; }
+else
+    echo -e "  ${YELLOW}(twine no instalado — omitiendo check de metadatos)${RESET}"
+fi
 rm -rf "$TMP_BUILD"
 ok "build OK"
 

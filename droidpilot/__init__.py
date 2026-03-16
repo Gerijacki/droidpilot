@@ -52,36 +52,47 @@ __all__ = [
 # Users should import directly from submodules for type-checker friendliness:
 #   from droidpilot.core.parser import DroidPilotParser
 
+
 def __getattr__(name: str) -> object:
     """Lazy top-level attribute access for heavy imports."""
     if name == "DroidPilotParser":
         from droidpilot.core.parser import DroidPilotParser
+
         return DroidPilotParser
     if name == "ExecutionEngine":
         from droidpilot.core.engine import ExecutionEngine
+
         return ExecutionEngine
     if name == "ExecutionContext":
         from droidpilot.core.context import ExecutionContext
+
         return ExecutionContext
     if name == "ExecutionResult":
         from droidpilot.core.engine import ExecutionResult
+
         return ExecutionResult
     if name == "ADBDevice":
         from droidpilot.adb.device import ADBDevice
+
         return ADBDevice
     if name == "ADBClient":
         from droidpilot.adb.client import ADBClient
+
         return ADBClient
     if name == "ParseError":
         from droidpilot.core.parser import ParseError
+
         return ParseError
     if name == "ExecutionError":
         from droidpilot.core.engine import ExecutionError
+
         return ExecutionError
     if name == "DeviceNotFoundError":
         from droidpilot.adb.client import DeviceNotFoundError
+
         return DeviceNotFoundError
     if name == "CommandError":
         from droidpilot.core.engine import CommandError
+
         return CommandError
     raise AttributeError(f"module 'droidpilot' has no attribute {name!r}")

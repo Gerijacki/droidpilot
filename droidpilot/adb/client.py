@@ -17,12 +17,9 @@ ADBError
 
 from __future__ import annotations
 
-import subprocess
 import shutil
-import time
-from dataclasses import dataclass, field
-from typing import Optional
-
+import subprocess
+from dataclasses import dataclass
 
 # ─── Exceptions ───────────────────────────────────────────────────────────────
 
@@ -418,6 +415,7 @@ class ADBClient:
         URL-encoded and sent via ``input text``.
         """
         import urllib.parse
+
         encoded = urllib.parse.quote(text, safe="")
         self.shell(f"input text '{encoded}'", serial=serial)
 
@@ -451,9 +449,7 @@ class ADBClient:
 
     def open_app(self, package: str, serial: str | None = None) -> None:
         """Launch an app by its package name using a MAIN intent."""
-        cmd = (
-            f"monkey -p {package} -c android.intent.category.LAUNCHER 1"
-        )
+        cmd = f"monkey -p {package} -c android.intent.category.LAUNCHER 1"
         self.shell(cmd, serial=serial)
 
     def force_stop(self, package: str, serial: str | None = None) -> None:
@@ -468,9 +464,7 @@ class ADBClient:
         """Uninstall an app by package name."""
         self._run([*self._serial_args(serial), "uninstall", package])
 
-    def list_packages(
-        self, filter_str: str = "", serial: str | None = None
-    ) -> list[str]:
+    def list_packages(self, filter_str: str = "", serial: str | None = None) -> list[str]:
         """Return a list of installed package names.
 
         Parameters
@@ -488,7 +482,7 @@ class ADBClient:
         for line in output.splitlines():
             line = line.strip()
             if line.startswith("package:"):
-                packages.append(line[len("package:"):])
+                packages.append(line[len("package:") :])
         return packages
 
     # ── Device information ────────────────────────────────────────────────────

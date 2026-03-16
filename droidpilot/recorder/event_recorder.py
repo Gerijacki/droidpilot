@@ -136,9 +136,7 @@ class GeteventParser:
         [   1234.568000] /dev/input/event1: EV_SYN       SYN_REPORT         00000000
     """
 
-    _LINE_RE = re.compile(
-        r"\[\s*(\d+\.\d+)\]\s+\S+:\s+(\S+)\s+(\S+)\s+([0-9a-fA-F]+)"
-    )
+    _LINE_RE = re.compile(r"\[\s*(\d+\.\d+)\]\s+\S+:\s+(\S+)\s+(\S+)\s+([0-9a-fA-F]+)")
 
     def parse(self, line: str) -> RawEvent | None:
         """Parse a single getevent output line.
@@ -352,9 +350,7 @@ class DSLGenerator:
                 lines.append(f"# long_press({evt.x}, {evt.y}, {evt.duration_ms})")
                 lines.append(f"tap({evt.x}, {evt.y})")
             elif evt.kind == EventKind.SWIPE:
-                lines.append(
-                    f"swipe({evt.x}, {evt.y}, {evt.x2}, {evt.y2}, {evt.duration_ms})"
-                )
+                lines.append(f"swipe({evt.x}, {evt.y}, {evt.x2}, {evt.y2}, {evt.duration_ms})")
             elif evt.kind == EventKind.KEY:
                 lines.append(f"key_event({evt.keycode})")
             elif evt.kind == EventKind.WAIT:
@@ -467,9 +463,7 @@ class EventRecorder:
             self._thread.join(timeout=3.0)
             self._thread = None
 
-        logger.info(
-            f"[recorder] stopped — {len(self._state.events)} event(s) captured"
-        )
+        logger.info(f"[recorder] stopped — {len(self._state.events)} event(s) captured")
 
     def _reader_loop(self) -> None:
         """Background thread: read getevent output and feed the state machine."""

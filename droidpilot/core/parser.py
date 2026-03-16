@@ -27,15 +27,14 @@ from lark import Lark, Token, Transformer, Tree, UnexpectedInput, v_args
 from lark.indenter import Indenter
 
 from droidpilot.core.ast_nodes import (
-    ASTNode,
     AssignNode,
+    ASTNode,
     BinaryOpNode,
     BoolLiteral,
     CommandNode,
     ComparisonNode,
     FloatLiteral,
     IfNode,
-    MacroCallNode,
     MacroDefNode,
     NumberLiteral,
     ProgramNode,
@@ -43,7 +42,6 @@ from droidpilot.core.ast_nodes import (
     StringLiteral,
     VariableRef,
 )
-
 
 # ─── Exceptions ───────────────────────────────────────────────────────────────
 
@@ -115,7 +113,7 @@ def _line(tree_or_token: Any) -> int:
 
 
 @v_args(inline=True)
-class DroidTransformer(Transformer):  # type: ignore[misc]
+class DroidTransformer(Transformer[Token, ProgramNode]):
     """Transforms a Lark parse tree into a DroidPilot AST.
 
     Each method corresponds to a rule in the grammar and returns the

@@ -37,8 +37,8 @@ logger = logging.getLogger("droidpilot.actions.text")
 _KEYCODE_ENTER = 66
 _KEYCODE_BACKSPACE = 67
 _KEYCODE_TAB = 61
-_KEYCODE_A = 29          # For select-all (CTRL+A via meta)
-_KEYCODE_CTRL_A = 277    # KEYCODE_CTRL_LEFT + A — not universally available
+_KEYCODE_A = 29  # For select-all (CTRL+A via meta)
+_KEYCODE_CTRL_A = 277  # KEYCODE_CTRL_LEFT + A — not universally available
 _KEYCODE_DEL = 67
 
 
@@ -103,9 +103,9 @@ def clear_field(device: "ADBDevice", max_chars: int = 200) -> None:
     # Try CTRL+A first (works on most modern Android devices).
     try:
         device.shell("input keyevent --longpress 277")  # KEYCODE_CTRL_LEFT
-        device.shell("input keyevent 29")               # A
+        device.shell("input keyevent 29")  # A
         time.sleep(0.05)
-        device.shell("input keyevent 67")               # BACKSPACE — delete selection
+        device.shell("input keyevent 67")  # BACKSPACE — delete selection
     except Exception:
         # Fallback: mash backspace.
         logger.debug(f"[clear_field] falling back to {max_chars} backspace events")
@@ -136,10 +136,7 @@ def paste_clipboard(device: "ADBDevice", text: str) -> None:
     safe_text = shlex.quote(text)
     logger.debug(f"[paste_clipboard] setting clipboard to {text!r}")
     # Set clipboard via a broadcast to our helper.
-    cmd = (
-        f"am broadcast -a clipper.set -e text {safe_text} "
-        "2>/dev/null || true"
-    )
+    cmd = f"am broadcast -a clipper.set -e text {safe_text} " "2>/dev/null || true"
     device.shell(cmd)
     time.sleep(0.1)
 

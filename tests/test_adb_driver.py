@@ -7,7 +7,7 @@ All subprocess calls are mocked so no real ADB binary is needed.
 from __future__ import annotations
 
 import subprocess
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -19,14 +19,16 @@ from droidpilot.adb.client import (
 )
 from droidpilot.adb.device import ADBDevice
 
-
 # ─── ADBClient fixtures / helpers ────────────────────────────────────────────
 
 
-_DEVICES_OUTPUT = """List of devices attached
-emulator-5554          device product:sdk_gphone model:sdk_gphone_x86 device:generic_x86 transport_id:1
-192.168.1.100:5555     device product:walleye model:Pixel_2 device:walleye transport_id:2
-"""
+_DEVICES_OUTPUT = (
+    "List of devices attached\n"
+    "emulator-5554          device product:sdk_gphone model:sdk_gphone_x86"
+    " device:generic_x86 transport_id:1\n"
+    "192.168.1.100:5555     device product:walleye model:Pixel_2"
+    " device:walleye transport_id:2\n"
+)
 
 _DEVICES_EMPTY = "List of devices attached\n"
 
@@ -153,30 +155,21 @@ class TestADBClientCommands:
         runner.return_value = _make_completed("")
         client.tap(100, 200, serial="emu-5554")
         # Verify that "input tap 100 200" appears somewhere in the call.
-        found = any(
-            "input tap 100 200" in str(c)
-            for c in runner.call_args_list
-        )
+        found = any("input tap 100 200" in str(c) for c in runner.call_args_list)
         assert found
 
     def test_swipe_runs_correct_shell(self) -> None:
         client, runner = _make_client()
         runner.return_value = _make_completed("")
         client.swipe(0, 0, 100, 200, 300, serial="emu-5554")
-        found = any(
-            "input swipe 0 0 100 200 300" in str(c)
-            for c in runner.call_args_list
-        )
+        found = any("input swipe 0 0 100 200 300" in str(c) for c in runner.call_args_list)
         assert found
 
     def test_key_event_runs_correct_shell(self) -> None:
         client, runner = _make_client()
         runner.return_value = _make_completed("")
         client.key_event(4, serial="emu-5554")
-        found = any(
-            "input keyevent 4" in str(c)
-            for c in runner.call_args_list
-        )
+        found = any("input keyevent 4" in str(c) for c in runner.call_args_list)
         assert found
 
     def test_shell_returns_stdout(self) -> None:
@@ -187,9 +180,11 @@ class TestADBClientCommands:
 
     def test_error_raises_adb_error(self) -> None:
         client, _ = _make_client()
+
         # Override _run to raise an ADBError.
         def fake_run(*a, **kw):
             raise ADBError("command failed", returncode=1)
+
         client._run = fake_run  # type: ignore[method-assign]
         with pytest.raises(ADBError):
             client.shell("bad command")
@@ -199,8 +194,7 @@ class TestADBClientCommands:
         runner.return_value = _make_completed("")
         client.open_app("com.example.app", serial="emu-5554")
         found = any(
-            "monkey" in str(c) and "com.example.app" in str(c)
-            for c in runner.call_args_list
+            "monkey" in str(c) and "com.example.app" in str(c) for c in runner.call_args_list
         )
         assert found
 
@@ -256,9 +250,7 @@ def _make_device_with_mock_client() -> tuple[ADBDevice, MagicMock]:
     """Return an ADBDevice backed by a fully mocked ADBClient."""
     mock_client = MagicMock()
     mock_client.first_device.return_value = "emulator-5554"
-    mock_client.get_device_entry.return_value = DeviceEntry(
-        serial="emulator-5554", state="device"
-    )
+    mock_client.get_device_entry.return_value = DeviceEntry(serial="emulator-5554", state="device")
 
     with patch("droidpilot.adb.device.ADBClient", return_value=mock_client):
         device = ADBDevice(serial="emulator-5554")
@@ -296,9 +288,7 @@ class TestADBDevice:
     def test_open_app_delegates(self) -> None:
         device, client = _make_device_with_mock_client()
         device.open_app("com.example.app")
-        client.open_app.assert_called_once_with(
-            "com.example.app", serial="emulator-5554"
-        )
+        client.open_app.assert_called_once_with("com.example.app", serial="emulator-5554")
 
     def test_screenshot_delegates(self, tmp_path) -> None:
         device, client = _make_device_with_mock_client()

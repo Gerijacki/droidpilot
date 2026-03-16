@@ -191,12 +191,13 @@ class ComparisonNode(ASTNode):
 
     def __post_init__(self) -> None:
         import operator as _op
+
         self._OP_MAP = {
             "==": _op.eq,
             "!=": _op.ne,
-            "<":  _op.lt,
+            "<": _op.lt,
             "<=": _op.le,
-            ">":  _op.gt,
+            ">": _op.gt,
             ">=": _op.ge,
         }
 
@@ -209,9 +210,7 @@ class ComparisonNode(ASTNode):
         return bool(fn(lv, rv))
 
     def __repr__(self) -> str:
-        return (
-            f"ComparisonNode({self.op!r}, {self.left!r}, {self.right!r}, line={self.line})"
-        )
+        return f"ComparisonNode({self.op!r}, {self.left!r}, {self.right!r}, line={self.line})"
 
 
 # ─── Statement nodes ─────────────────────────────────────────────────────────
@@ -326,9 +325,7 @@ class MacroCallNode(ASTNode):
                 f"got {len(evaluated)} at line {self.line}"
             )
 
-        context.logger.debug(
-            f"[macro_call] {self.name}({', '.join(repr(a) for a in evaluated)})"
-        )
+        context.logger.debug(f"[macro_call] {self.name}({', '.join(repr(a) for a in evaluated)})")
 
         # Push a new variable scope for the macro invocation.
         with context.scoped_vars({p: v for p, v in zip(macro_def.params, evaluated)}):
@@ -431,10 +428,7 @@ class ProgramNode(ASTNode):
             stmt.execute(context)
 
     def __repr__(self) -> str:
-        return (
-            f"ProgramNode(source={self.source!r}, "
-            f"statements={len(self.statements)})"
-        )
+        return f"ProgramNode(source={self.source!r}, " f"statements={len(self.statements)})"
 
     def pretty(self, indent: int = 0) -> str:
         """Return a pretty-printed string representation of the AST."""

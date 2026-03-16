@@ -37,19 +37,12 @@ import time
 import traceback
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from droidpilot.core.ast_nodes import (
-    AssignNode,
-    CommandNode,
-    IfNode,
-    MacroCallNode,
-    MacroDefNode,
     ProgramNode,
-    RepeatNode,
 )
 from droidpilot.core.context import ExecutionContext, ExecutionStats
-
 
 # ─── Exceptions ───────────────────────────────────────────────────────────────
 
@@ -214,7 +207,7 @@ def _cmd_device_info(ctx: ExecutionContext) -> dict[str, str]:
         f"  Serial:     {info.get('serial', 'unknown')}"
     )
     ctx.stats.commands_executed += 1
-    return info
+    return cast(dict[str, str], info)
 
 
 def _cmd_list_devices(ctx: ExecutionContext) -> list[str]:
@@ -351,22 +344,22 @@ def _cmd_stop(ctx: ExecutionContext) -> None:
 
 
 BUILTIN_COMMANDS: dict[str, Any] = {
-    "tap":          _cmd_tap,
-    "swipe":        _cmd_swipe,
-    "type":         _cmd_type,
-    "wait":         _cmd_wait,
-    "screenshot":   _cmd_screenshot,
-    "open_app":     _cmd_open_app,
-    "device_info":  _cmd_device_info,
+    "tap": _cmd_tap,
+    "swipe": _cmd_swipe,
+    "type": _cmd_type,
+    "wait": _cmd_wait,
+    "screenshot": _cmd_screenshot,
+    "open_app": _cmd_open_app,
+    "device_info": _cmd_device_info,
     "list_devices": _cmd_list_devices,
-    "exists":       _cmd_exists,
-    "tap_image":    _cmd_tap_image,
-    "key_event":    _cmd_key_event,
-    "back":         _cmd_back,
-    "home":         _cmd_home,
-    "recent":       _cmd_recent,
-    "print":        _cmd_print,
-    "stop":         _cmd_stop,
+    "exists": _cmd_exists,
+    "tap_image": _cmd_tap_image,
+    "key_event": _cmd_key_event,
+    "back": _cmd_back,
+    "home": _cmd_home,
+    "recent": _cmd_recent,
+    "print": _cmd_print,
+    "stop": _cmd_stop,
 }
 
 
@@ -500,9 +493,7 @@ class ExecutionEngine:
 
         success = len(errors) == 0 and not context.should_stop
         context.complete(success=success)
-        context.logger.info(
-            f"[engine] finished: {'OK' if success else 'FAILED'} — {context.stats}"
-        )
+        context.logger.info(f"[engine] finished: {'OK' if success else 'FAILED'} — {context.stats}")
         return ExecutionResult(
             success=success,
             errors=errors,

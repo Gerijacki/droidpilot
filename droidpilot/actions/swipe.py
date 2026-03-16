@@ -73,8 +73,7 @@ def swipe(
     """
     if any(c < 0 for c in (x1, y1, x2, y2)):
         raise ValueError(
-            f"Swipe coordinates must be non-negative, got "
-            f"({x1}, {y1}) → ({x2}, {y2})"
+            f"Swipe coordinates must be non-negative, got " f"({x1}, {y1}) → ({x2}, {y2})"
         )
     if duration_ms <= 0:
         raise ValueError(f"duration_ms must be positive, got {duration_ms}")
