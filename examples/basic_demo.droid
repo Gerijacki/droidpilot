@@ -1,0 +1,41 @@
+# basic_demo.droid
+# Demonstrates core DroidPilot DSL features.
+# Run with: droidpilot run examples/basic_demo.droid
+
+# ── App launch ────────────────────────────────────────────────────────────────
+
+open_app("com.android.settings")
+wait(2)
+
+# ── Variable usage ────────────────────────────────────────────────────────────
+
+screen_cx = 540
+screen_top = 300
+screen_bottom = 1800
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+
+tap(screen_cx, 400)
+wait(1)
+
+# ── Scroll down three times ───────────────────────────────────────────────────
+
+repeat 3:
+    swipe(screen_cx, screen_bottom, screen_cx, screen_top, 400)
+    wait(0.5)
+
+# ── Take a screenshot ─────────────────────────────────────────────────────────
+
+screenshot("settings_screen.png")
+print("Screenshot saved to settings_screen.png")
+
+# ── Device info ───────────────────────────────────────────────────────────────
+
+device_info()
+
+# ── Go home ───────────────────────────────────────────────────────────────────
+
+home()
+wait(1)
+
+print("basic_demo complete!")

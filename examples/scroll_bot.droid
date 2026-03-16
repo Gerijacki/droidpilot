@@ -1,0 +1,45 @@
+# scroll_bot.droid
+# Continuously scrolls through a feed and takes periodic screenshots.
+# Useful as a stress test or for content harvesting demos.
+#
+# Run with: droidpilot run examples/scroll_bot.droid
+
+# ── Configuration variables ───────────────────────────────────────────────────
+
+scroll_cx = 540
+scroll_start_y = 1600
+scroll_end_y = 400
+scroll_duration = 350
+pause_between = 0.8
+screenshot_interval = 5
+
+# ── Macros ────────────────────────────────────────────────────────────────────
+
+macro do_scroll():
+    swipe(scroll_cx, scroll_start_y, scroll_cx, scroll_end_y, scroll_duration)
+    wait(pause_between)
+
+macro take_snapshot(name):
+    screenshot(name)
+    print("Snapshot saved")
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+print("Starting scroll bot...")
+
+# Open a content app
+open_app("com.google.android.youtube")
+wait(3)
+
+# Dismiss any popups by tapping away
+tap(540, 900)
+wait(1)
+
+# Scroll loop
+repeat 30:
+    do_scroll()
+
+# Take a final screenshot
+take_snapshot("scroll_bot_end.png")
+print("Scroll bot finished.")
+home()

@@ -1,0 +1,9 @@
+click>=8.1
+lark>=1.1
+pydantic>=2.0
+rich>=13.0
+opencv-python>=4.8
+numpy>=1.24
+pytest>=7.4
+pytest-cov>=4.1
+pytest-mock>=3.11

@@ -1,0 +1,44 @@
+# instagram_bot.droid
+# Scrolls the Instagram feed and auto-likes posts that match a template.
+# Requires template images: like_inactive.png, like_active.png
+#
+# Run with:
+#   droidpilot run examples/instagram_bot.droid --device emulator-5554
+
+# ── Launch Instagram ──────────────────────────────────────────────────────────
+
+open_app("com.instagram.android")
+wait(4)
+
+# ── Macros ────────────────────────────────────────────────────────────────────
+
+macro scroll_feed():
+    swipe(540, 1500, 540, 500, 450)
+    wait(1.2)
+
+macro like_post():
+    if exists("like_inactive.png"):
+        tap_image("like_inactive.png")
+        wait(0.4)
+    else:
+        print("Post already liked or button not visible")
+
+macro screenshot_feed(filename):
+    screenshot(filename)
+    print("Saved feed screenshot")
+
+# ── Main loop ─────────────────────────────────────────────────────────────────
+
+# Let the feed load fully
+wait(2)
+
+counter = 0
+
+repeat 20:
+    like_post()
+    scroll_feed()
+    counter = counter + 1
+
+print("Instagram bot finished.")
+screenshot("instagram_final.png")
+home()

@@ -1,0 +1,99 @@
+// DroidPilot DSL Grammar
+// Lark LALR(1) grammar with Python-style indentation.
+// Uses the built-in Indenter for _INDENT / _DEDENT tokens.
+
+// ─── Entry point ────────────────────────────────────────────────────────────
+
+start: _NEWLINE* statement*
+
+// ─── Statements ─────────────────────────────────────────────────────────────
+
+statement: simple_stmt _NEWLINE
+         | compound_stmt
+
+simple_stmt: assign_stmt
+           | call_stmt
+
+compound_stmt: if_stmt
+             | repeat_stmt
+             | macro_def_stmt
+
+// ─── Assignment ──────────────────────────────────────────────────────────────
+
+assign_stmt: NAME "=" expr
+
+// ─── Call (command or macro — disambiguated at runtime) ──────────────────────
+// Syntactically identical; the engine checks command registry first, then macros.
+
+call_stmt: NAME "(" arg_list? ")"
+
+arg_list: expr ("," expr)*
+
+// ─── If / else ───────────────────────────────────────────────────────────────
+
+if_stmt: "if" condition ":" _NEWLINE _INDENT statement+ _DEDENT else_clause?
+
+else_clause: "else" ":" _NEWLINE _INDENT statement+ _DEDENT
+
+// ─── Repeat ──────────────────────────────────────────────────────────────────
+
+repeat_stmt: "repeat" expr ":" _NEWLINE _INDENT statement+ _DEDENT
+
+// ─── Macro definition ────────────────────────────────────────────────────────
+
+macro_def_stmt: "macro" NAME "(" param_list? ")" ":" _NEWLINE _INDENT statement+ _DEDENT
+
+param_list: NAME ("," NAME)*
+
+// ─── Conditions ──────────────────────────────────────────────────────────────
+
+condition: expr comparison_op expr  -> comparison
+         | call_stmt                -> cmd_condition
+         | expr                     -> expr_condition
+
+comparison_op: "=="  -> eq
+             | "!="  -> ne
+             | "<"   -> lt
+             | "<="  -> le
+             | ">"   -> gt
+             | ">="  -> ge
+
+// ─── Expressions ─────────────────────────────────────────────────────────────
+
+expr: atom
+    | expr "+" expr   -> add
+    | expr "-" expr   -> sub
+    | expr "*" expr   -> mul
+    | expr "/" expr   -> div
+
+atom: NUMBER          -> number
+    | FLOAT           -> float_number
+    | ESCAPED_STRING  -> string
+    | "true"          -> bool_true
+    | "false"         -> bool_false
+    | NAME            -> var_ref
+    | "(" expr ")"    -> grouped
+
+// ─── Terminals ───────────────────────────────────────────────────────────────
+
+%import common.CNAME        -> NAME
+%import common.INT          -> NUMBER
+%import common.SIGNED_FLOAT -> FLOAT
+%import common.ESCAPED_STRING
+%import common.WS_INLINE
+%import common.SH_COMMENT
+
+// _NEWLINE captures the newline AND the indentation of the next line.
+// This is required by DroidIndenter to detect indent/dedent transitions.
+// Lark 1.x common.NEWLINE does NOT include trailing whitespace, so we
+// define our own terminal here.
+_NEWLINE: /(\r?\n[\t ]*)+/
+
+// Ignore inline whitespace and comments (but NOT _NEWLINE which the Indenter needs)
+%ignore WS_INLINE
+%ignore SH_COMMENT
+
+// Indentation tokens are injected by the DroidIndenter post-lexer.
+// They must be declared here so Lark knows about them without defining
+// them as terminal patterns.
+%declare _INDENT _DEDENT
